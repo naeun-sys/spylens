@@ -1,199 +1,203 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpyLens - 불법촬영 카메라 탐지 보조 서비스</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 700px;
+            margin: 30px auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin: 20px 0;
+        }
+        .btn {
+            border: 2px solid #007bff;
+            color: white;
+            background-color: #007bff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .canvas-container {
+            margin-top: 20px;
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+        canvas {
+            max-width: 100%;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            align-items: center;
+        }
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        input[type=range] {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="ko"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1">&lt;title&gt;SpyLens - 불법촬영 카메라 탐지&lt;/title&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;style&gt;</p>
-<p class="p1">body{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>font-family: Arial, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>text-align:center;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>margin:20px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>background:#f4f4f4;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">h1{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>color:#333;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.container{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>background:white;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>padding:20px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>border-radius:10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>max-width:900px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>margin:auto;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>box-shadow:0 0 10px rgba(0,0,0,0.1);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">canvas{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>max-width:100%;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>border:1px solid #ccc;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>margin-top:15px;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">button{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>padding:10px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>margin:10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>cursor:pointer;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>border:none;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>border-radius:5px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>background:#007bff;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>color:white;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">button:hover{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>background:#0056b3;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">#result{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>font-size:18px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>font-weight:bold;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>margin-top:10px;</p>
-<p class="p1">}</p>
-<p class="p1">&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;🔍 SpyLens&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;p&gt;불법촬영 카메라 반사광 탐지 보조 서비스&lt;/p&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="file" id="imageInput" accept="image/*"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;br&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="detectReflections()"&gt;탐지 시작&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;p id="result"&gt;&lt;/p&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;canvas id="canvas"&gt;&lt;/canvas&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">const imageInput = document.getElementById('imageInput');</p>
-<p class="p1">const canvas = document.getElementById('canvas');</p>
-<p class="p1">const ctx = canvas.getContext('2d');</p>
-<p class="p2"><br></p>
-<p class="p1">let uploadedImage = new Image();</p>
-<p class="p2"><br></p>
-<p class="p1">imageInput.addEventListener('change', function(e){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const file = e.target.files[0];</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(!file) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const reader = new FileReader();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>reader.onload = function(event){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>uploadedImage.onload = function(){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>canvas.width = uploadedImage.width;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>canvas.height = uploadedImage.height;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.drawImage(</p>
-<p class="p1"><span class="Apple-converted-space">                </span>uploadedImage,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>0,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>0</p>
-<p class="p1"><span class="Apple-converted-space">            </span>);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>uploadedImage.src = event.target.result;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>reader.readAsDataURL(file);</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">function detectReflections(){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(!uploadedImage.src){</p>
-<p class="p1"><span class="Apple-converted-space">        </span>alert("이미지를 먼저 업로드하세요.");</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.drawImage(uploadedImage,0,0);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const imageData = ctx.getImageData(</p>
-<p class="p1"><span class="Apple-converted-space">        </span>0,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>0,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>canvas.width,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>canvas.height</p>
-<p class="p1"><span class="Apple-converted-space">    </span>);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const data = imageData.data;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>let detections = [];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>for(let y=0; y&lt;canvas.height; y+=8){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>for(let x=0; x&lt;canvas.width; x+=8){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const index =</p>
-<p class="p1"><span class="Apple-converted-space">                </span>(y * canvas.width + x) * 4;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const r = data[index];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const g = data[index+1];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const b = data[index+2];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const brightness =</p>
-<p class="p1"><span class="Apple-converted-space">                </span>(r+g+b)/3;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if(brightness &gt; 240){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>detections.push({</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>x:x,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>y:y</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>detections = detections.filter((point,index)=&gt;{</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>return index % 5 === 0;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.lineWidth = 3;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.strokeStyle = "red";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>detections.forEach(point=&gt;{</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.beginPath();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.arc(</p>
-<p class="p1"><span class="Apple-converted-space">            </span>point.x,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>point.y,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>15,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Math.PI*2</p>
-<p class="p1"><span class="Apple-converted-space">        </span>);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.stroke();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("result").innerText =</p>
-<p class="p1"><span class="Apple-converted-space">        </span>`의심 반사 지점 ${detections.length}개 발견`;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div class="container">
+    <h1>SpyLens (스파이렌즈)</h1>
+    <p>주변 공간(화장실, 탈의실, 숙박시설 등)의 사진을 업로드하세요.<br>카메라 렌즈로 의심되는 강한 빛 반사 영역을 탐지하여 표시해 줍니다.</p>
+    
+    <div class="upload-btn-wrapper">
+        <button class="btn">공간 사진 업로드</button>
+        <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
+    </div>
+
+    <div class="controls" id="controlPanel" style="display:none;">
+        <div>
+            <label for="thresholdRange">탐지 민감도: </label>
+            <input type="range" id="thresholdRange" min="200" max="255" value="240">
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="imageCanvas"></canvas>
+    </div>
+</div>
+
+<script>
+    const imageLoader = document.getElementById('imageLoader');
+    const imageCanvas = document.getElementById('imageCanvas');
+    const ctx = imageCanvas.getContext('2d');
+    const thresholdRange = document.getElementById('thresholdRange');
+    const controlPanel = document.getElementById('controlPanel');
+    let originalImage = new Image();
+
+    imageLoader.addEventListener('change', handleImage, false);
+    thresholdRange.addEventListener('input', () => {
+        if(originalImage.src) {
+            processImage();
+        }
+    });
+
+    function handleImage(e) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            originalImage.onload = function() {
+                // 브라우저 화면에 맞춰 적절한 크기로 캔버스 설정
+                const maxW = 600;
+                const scale = maxW / originalImage.width;
+                if(originalImage.width > maxW) {
+                    imageCanvas.width = maxW;
+                    imageCanvas.height = originalImage.height * scale;
+                } else {
+                    imageCanvas.width = originalImage.width;
+                    imageCanvas.height = originalImage.height;
+                }
+                controlPanel.style.display = 'flex';
+                processImage();
+            }
+            originalImage.src = event.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function processImage() {
+        // 1. 캔버스에 원본 이미지 그리기
+        ctx.drawImage(originalImage, 0, 0, imageCanvas.width, imageCanvas.height);
+        
+        // 2. 픽셀 데이터 가져오기 (밝은 반사 지점 분석)
+        const imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+        const data = imageData.data;
+        const threshold = parseInt(thresholdRange.value);
+        
+        const detectionPoints = [];
+
+        // 픽셀을 순회하며 설정한 민감도보다 밝은 흰색 영역(빛 반사) 검출
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            
+            // 단순 밝기 계산 (RGB 평균값)
+            const brightness = (r + g + b) / 3;
+            
+            if (brightness > threshold) {
+                const pixelIndex = i / 4;
+                const x = pixelIndex % imageCanvas.width;
+                const y = Math.floor(pixelIndex / imageCanvas.width);
+                detectionPoints.push({x, y});
+            }
+        }
+
+        // 3. 검출된 반사 지점에 빨간색 원으로 카메라 의심 구역 표시하기
+        // 너무 촘촘하게 그려지는 것을 방지하기 위해 일정 간격 격자로 그룹화하여 마킹
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth = 3;
+
+        // 마킹 프로세스 (간단한 군집 시각화)
+        if(detectionPoints.length > 0) {
+            // 샘플링하여 의심 영역 주변에 경고 원 표시
+            for(let p = 0; p < detectionPoints.length; p += 150) {
+                const pt = detectionPoints[p];
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 20, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                // 안쪽 작은 점
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+    }
+</script>
+
 </body>
 </html>
