@@ -3,82 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SpyLens - 불법촬영 카메라 탐지</title>
+<title>SpyLens - 불법촬영 카메라 탐지 보조 서비스</title>
 
 <style>
 body{
     font-family: Arial, sans-serif;
+    background:#f5f7fb;
+    margin:0;
     text-align:center;
-    margin:20px;
-    background:#f4f4f4;
 }
 
-h1{
-    color:#333;
+header{
+    background:#1f2937;
+    color:white;
+    padding:20px;
 }
 
 .container{
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+.upload-box{
     background:white;
     padding:20px;
     border-radius:10px;
-    max-width:900px;
-    margin:auto;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+button:hover{
+    background:#1d4ed8;
 }
 
 canvas{
     max-width:100%;
-    border:1px solid #ccc;
-    margin-top:15px;
-}
-
-button{
-    padding:10px 20px;
-    margin:10px;
-    cursor:pointer;
-    border:none;
-    border-radius:5px;
-    background:#007bff;
-    color:white;
-}
-
-button:hover{
-    background:#0056b3;
+    margin-top:20px;
+    border:1px solid #ddd;
 }
 
 #result{
+    margin-top:15px;
     font-size:18px;
     font-weight:bold;
-    margin-top:10px;
+}
+
+.info{
+    margin-top:20px;
+    background:white;
+    padding:15px;
+    border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
+<header>
+<h1>🔍 SpyLens</h1>
+<p>AI 기반 불법촬영 카메라 탐지 보조 서비스</p>
+</header>
+
 <div class="container">
-    <h1>🔍 SpyLens</h1>
-    <p>불법촬영 카메라 반사광 탐지 보조 서비스</p>
 
-    <input type="file" id="imageInput" accept="image/*">
-    <br>
+<div class="upload-box">
+<h2>사진 업로드</h2>
+<input type="file" id="imageInput" accept="image/*">
+<br>
+<button onclick="detectCamera()">탐지 시작</button>
 
-    <button onclick="detectReflections()">탐지 시작</button>
+<p id="result"></p>
 
-    <p id="result"></p>
+<canvas id="canvas"></canvas>
+</div>
 
-    <canvas id="canvas"></canvas>
+<div class="info">
+<h3>서비스 설명</h3>
+<p>
+사진 속 강한 반사광을 분석하여 카메라 렌즈로 의심되는 위치를 표시합니다.
+실제 탐지 장비가 아닌 교육용 프로토타입입니다.
+</p>
+</div>
+
 </div>
 
 <script>
 
-const imageInput = document.getElementById('imageInput');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-let uploadedImage = new Image();
+let img = new Image();
 
-imageInput.addEventListener('change', function(e){
+document.getElementById("imageInput").addEventListener("change", function(e){
 
     const file = e.target.files[0];
     if(!file) return;
@@ -87,34 +113,31 @@ imageInput.addEventListener('change', function(e){
 
     reader.onload = function(event){
 
-        uploadedImage.onload = function(){
+        img.onload = function(){
 
-            canvas.width = uploadedImage.width;
-            canvas.height = uploadedImage.height;
+            canvas.width = img.width;
+            canvas.height = img.height;
 
-            ctx.drawImage(
-                uploadedImage,
-                0,
-                0
-            );
+            ctx.drawImage(img,0,0);
         };
 
-        uploadedImage.src = event.target.result;
+        img.src = event.target.result;
     };
 
     reader.readAsDataURL(file);
 });
 
-function detectReflections(){
+function detectCamera(){
 
-    if(!uploadedImage.src){
-        alert("이미지를 먼저 업로드하세요.");
+    if(!img.src){
+        alert("이미지를 업로드해주세요.");
         return;
     }
 
-    ctx.drawImage(uploadedImage,0,0);
+    ctx.drawImage(img,0,0);
 
-    const imageData = ctx.getImageData(
+    const imageData =
+    ctx.getImageData(
         0,
         0,
         canvas.width,
@@ -123,58 +146,45 @@ function detectReflections(){
 
     const data = imageData.data;
 
-    let detections = [];
+    let count = 0;
 
-    for(let y=0; y<canvas.height; y+=8){
+    for(let y=0; y<canvas.height; y+=10){
 
-        for(let x=0; x<canvas.width; x+=8){
+        for(let x=0; x<canvas.width; x+=10){
 
-            const index =
-                (y * canvas.width + x) * 4;
+            const i =
+            (y * canvas.width + x) * 4;
 
-            const r = data[index];
-            const g = data[index+1];
-            const b = data[index+2];
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
 
             const brightness =
-                (r+g+b)/3;
+            (r+g+b)/3;
 
             if(brightness > 240){
 
-                detections.push({
-                    x:x,
-                    y:y
-                });
+                ctx.beginPath();
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+
+                ctx.arc(
+                    x,
+                    y,
+                    12,
+                    0,
+                    Math.PI*2
+                );
+
+                ctx.stroke();
+
+                count++;
             }
         }
     }
 
-    detections = detections.filter((point,index)=>{
-
-        return index % 5 === 0;
-
-    });
-
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "red";
-
-    detections.forEach(point=>{
-
-        ctx.beginPath();
-
-        ctx.arc(
-            point.x,
-            point.y,
-            15,
-            0,
-            Math.PI*2
-        );
-
-        ctx.stroke();
-    });
-
-    document.getElementById("result").innerText =
-        `의심 반사 지점 ${detections.length}개 발견`;
+    document.getElementById("result").innerHTML =
+    "의심 반사 지점 발견: " + count + "개";
 }
 
 </script>
