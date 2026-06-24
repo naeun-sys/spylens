@@ -1,202 +1,182 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpyLens - 불법촬영 카메라 탐지 보조 서비스</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 700px;
-            margin: 30px auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #007bff;
-            margin-bottom: 10px;
-        }
-        p {
-            font-size: 15px;
-            color: #666;
-            line-height: 1.6;
-        }
-        .upload-btn-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            margin: 20px 0;
-        }
-        .btn {
-            border: 2px solid #007bff;
-            color: white;
-            background-color: #007bff;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        .upload-btn-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-        .canvas-container {
-            margin-top: 20px;
-            position: relative;
-            display: inline-block;
-            max-width: 100%;
-        }
-        canvas {
-            max-width: 100%;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            background-color: #fafafa;
-        }
-        .controls {
-            margin-top: 15px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            align-items: center;
-        }
-        label {
-            font-size: 14px;
-            font-weight: bold;
-        }
-        input[type=range] {
-            cursor: pointer;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpyLens - 불법촬영 카메라 탐지</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    text-align:center;
+    margin:20px;
+    background:#f4f4f4;
+}
+
+h1{
+    color:#333;
+}
+
+.container{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    max-width:900px;
+    margin:auto;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+canvas{
+    max-width:100%;
+    border:1px solid #ccc;
+    margin-top:15px;
+}
+
+button{
+    padding:10px 20px;
+    margin:10px;
+    cursor:pointer;
+    border:none;
+    border-radius:5px;
+    background:#007bff;
+    color:white;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+#result{
+    font-size:18px;
+    font-weight:bold;
+    margin-top:10px;
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <h1>SpyLens (스파이렌즈)</h1>
-    <p>주변 공간(화장실, 탈의실, 숙박시설 등)의 사진을 업로드하세요.<br>카메라 렌즈로 의심되는 강한 빛 반사 영역을 탐지하여 표시해 줍니다.</p>
-    
-    <div class="upload-btn-wrapper">
-        <button class="btn">공간 사진 업로드</button>
-        <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
-    </div>
+    <h1>🔍 SpyLens</h1>
+    <p>불법촬영 카메라 반사광 탐지 보조 서비스</p>
 
-    <div class="controls" id="controlPanel" style="display:none;">
-        <div>
-            <label for="thresholdRange">탐지 민감도: </label>
-            <input type="range" id="thresholdRange" min="200" max="255" value="240">
-        </div>
-    </div>
+    <input type="file" id="imageInput" accept="image/*">
+    <br>
 
-    <div class="canvas-container">
-        <canvas id="imageCanvas"></canvas>
-    </div>
+    <button onclick="detectReflections()">탐지 시작</button>
+
+    <p id="result"></p>
+
+    <canvas id="canvas"></canvas>
 </div>
 
 <script>
-    const imageLoader = document.getElementById('imageLoader');
-    const imageCanvas = document.getElementById('imageCanvas');
-    const ctx = imageCanvas.getContext('2d');
-    const thresholdRange = document.getElementById('thresholdRange');
-    const controlPanel = document.getElementById('controlPanel');
-    let originalImage = new Image();
 
-    imageLoader.addEventListener('change', handleImage, false);
-    thresholdRange.addEventListener('input', () => {
-        if(originalImage.src) {
-            processImage();
+const imageInput = document.getElementById('imageInput');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let uploadedImage = new Image();
+
+imageInput.addEventListener('change', function(e){
+
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+
+        uploadedImage.onload = function(){
+
+            canvas.width = uploadedImage.width;
+            canvas.height = uploadedImage.height;
+
+            ctx.drawImage(
+                uploadedImage,
+                0,
+                0
+            );
+        };
+
+        uploadedImage.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
+});
+
+function detectReflections(){
+
+    if(!uploadedImage.src){
+        alert("이미지를 먼저 업로드하세요.");
+        return;
+    }
+
+    ctx.drawImage(uploadedImage,0,0);
+
+    const imageData = ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const data = imageData.data;
+
+    let detections = [];
+
+    for(let y=0; y<canvas.height; y+=8){
+
+        for(let x=0; x<canvas.width; x+=8){
+
+            const index =
+                (y * canvas.width + x) * 4;
+
+            const r = data[index];
+            const g = data[index+1];
+            const b = data[index+2];
+
+            const brightness =
+                (r+g+b)/3;
+
+            if(brightness > 240){
+
+                detections.push({
+                    x:x,
+                    y:y
+                });
+            }
         }
+    }
+
+    detections = detections.filter((point,index)=>{
+
+        return index % 5 === 0;
+
     });
 
-    function handleImage(e) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            originalImage.onload = function() {
-                // 브라우저 화면에 맞춰 적절한 크기로 캔버스 설정
-                const maxW = 600;
-                const scale = maxW / originalImage.width;
-                if(originalImage.width > maxW) {
-                    imageCanvas.width = maxW;
-                    imageCanvas.height = originalImage.height * scale;
-                } else {
-                    imageCanvas.width = originalImage.width;
-                    imageCanvas.height = originalImage.height;
-                }
-                controlPanel.style.display = 'flex';
-                processImage();
-            }
-            originalImage.src = event.target.result;
-        }
-        reader.readAsDataURL(e.target.files[0]);
-    }
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "red";
 
-    function processImage() {
-        // 1. 캔버스에 원본 이미지 그리기
-        ctx.drawImage(originalImage, 0, 0, imageCanvas.width, imageCanvas.height);
-        
-        // 2. 픽셀 데이터 가져오기 (밝은 반사 지점 분석)
-        const imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
-        const data = imageData.data;
-        const threshold = parseInt(thresholdRange.value);
-        
-        const detectionPoints = [];
+    detections.forEach(point=>{
 
-        // 픽셀을 순회하며 설정한 민감도보다 밝은 흰색 영역(빛 반사) 검출
-        for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i+1];
-            const b = data[i+2];
-            
-            // 단순 밝기 계산 (RGB 평균값)
-            const brightness = (r + g + b) / 3;
-            
-            if (brightness > threshold) {
-                const pixelIndex = i / 4;
-                const x = pixelIndex % imageCanvas.width;
-                const y = Math.floor(pixelIndex / imageCanvas.width);
-                detectionPoints.push({x, y});
-            }
-        }
+        ctx.beginPath();
 
-        // 3. 검출된 반사 지점에 빨간색 원으로 카메라 의심 구역 표시하기
-        // 너무 촘촘하게 그려지는 것을 방지하기 위해 일정 간격 격자로 그룹화하여 마킹
-        ctx.strokeStyle = '#ff0000';
-        ctx.lineWidth = 3;
+        ctx.arc(
+            point.x,
+            point.y,
+            15,
+            0,
+            Math.PI*2
+        );
 
-        // 마킹 프로세스 (간단한 군집 시각화)
-        if(detectionPoints.length > 0) {
-            // 샘플링하여 의심 영역 주변에 경고 원 표시
-            for(let p = 0; p < detectionPoints.length; p += 150) {
-                const pt = detectionPoints[p];
-                ctx.beginPath();
-                ctx.arc(pt.x, pt.y, 20, 0, 2 * Math.PI);
-                ctx.stroke();
-                
-                // 안쪽 작은 점
-                ctx.fillStyle = '#ff0000';
-                ctx.beginPath();
-                ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
-                ctx.fill();
-            }
-        }
-    }
+        ctx.stroke();
+    });
+
+    document.getElementById("result").innerText =
+        `의심 반사 지점 ${detections.length}개 발견`;
+}
+
 </script>
 
 </body>
